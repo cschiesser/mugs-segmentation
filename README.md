@@ -8,18 +8,9 @@ Given an RGB image (252 × 378 × 3), predict a binary mask of the same spatial 
 ## Repository Structure
 ```
 sml_project2/
+├── config.yaml             # All hyperparameters in one flat file
 ├── eth_mugs_dataset.py     # Dataset class with augmentations
-├── train.py                # Training loop with checkpointing
-├── predict.py              # Inference + RLE encoding for Kaggle
-├── utils.py                # Metrics, RLE, save_predictions
-├── models/
-│   ├── __init__.py
-│   ├── unet.py             # Classical U-Net (baseline)
-│   └── unet_residual.py    # U-Net with residual blocks (improved)
-├── configs/
-│   ├── unet_small.yaml     # base_channels=32, depth=4
-│   ├── unet_large.yaml     # base_channels=64, depth=4
-│   └── unet_residual.yaml  # residual variant
+├── train.py                # Everything: models, loss, training, prediction
 ├── datasets/
 │   ├── train_data/
 │   │   ├── rgb/            # *_rgb.jpg
@@ -54,36 +45,42 @@ datasets/test_data/rgb/0001_rgb.jpg, ...
 
 ### 3. Sanity check
 ```bash
-python -c "from eth_mugs_dataset import ETHMugsDataset; \
-  d = ETHMugsDataset('datasets/train_data', mode='train'); \
-  print(f'Train samples: {len(d)}'); \
-  img, mask = d[0]; \
-  print(f'img: {img.shape}, mask: {mask.shape}, mask values: {mask.unique()}')"
+python -c "
+from eth_mugs_dataset import make_train_val_split
+train_ds, val_ds = make_train_val_split('datasets/train_data', val_fraction=0.15, seed=42)
+print(f'Train: {len(train_ds)}, Val: {len(val_ds)}')
+img, mask = train_ds[0]
+print(f'img: {img.shape}, mask mean: {mask.mean().item():.4f}')
+"
 ```
 
 ## Training
 
-Train with a config file:
+Edit `config.yaml` to configure your run, then:
+
 ```bash
-python train.py --config configs/unet_small.yaml
-python train.py --config configs/unet_large.yaml
-python train.py --config configs/unet_residual.yaml
+python train.py                        # uses config.yaml by default
+python train.py --config config.yaml   # same
+python train.py --resume checkpoints/unet_small_best.pt  # resume
 ```
 
-Useful flags:
-- `--resume checkpoints/unet_small_best.pt` — resume from checkpoint
-- `--no-amp` — disable mixed-precision (useful for debugging)
+To switch models or configurations, just edit `config.yaml`:
+- `model_name: unet` or `model_name: resunet`
+- `base_channels: 32` (small) or `base_channels: 64` (large)
 
 Checkpoints are saved as `checkpoints/<run_name>_best.pt` (best validation IoU) and `<run_name>_last.pt` (last epoch).
 
 ## Prediction & Kaggle Submission
 
 ```bash
-python predict.py \
-  --config configs/unet_residual.yaml \
-  --checkpoint checkpoints/unet_residual_best.pt \
-  --output predictions/submission_unet_residual.csv
+python train.py --predict \
+  --checkpoint checkpoints/unet_small_best.pt \
+  --output predictions/submission.csv
 ```
+
+Optional flags:
+- `--threshold 0.5` — sigmoid threshold (default: 0.5)
+- `--tta` — horizontal-flip test-time augmentation
 
 Upload the resulting CSV to Kaggle. Format:
 ```
@@ -94,11 +91,11 @@ ImageId,EncodedPixels
 
 ## Approach
 
-**Baseline:** Classical U-Net with configurable depth and base channel count (`models/unet.py`).
+**Baseline:** Classical U-Net with configurable depth and base channel count.
 
-**Improved:** U-Net with residual blocks in encoder and decoder (`models/unet_residual.py`) — better gradient flow, can train deeper.
+**Improved:** U-Net with residual blocks in encoder and decoder (`model_name: resunet`) — better gradient flow, typically converges faster.
 
-**Two configurations** for the report comparison: `unet_small` (base=32) vs `unet_large` (base=64), same depth.
+**Two configurations** for the report comparison: `base_channels: 32` (small) vs `base_channels: 64` (large), same depth.
 
 **Loss:** BCE + Dice (handles class imbalance — mug pixels are a small fraction of the image).
 
@@ -108,4 +105,4 @@ ImageId,EncodedPixels
 
 - No pretrained models allowed (per project specs). All weights initialized from scratch.
 - Image native resolution is 378 × 252; we train at this resolution by default.
-- Random seed pinned in configs for reproducibility.
+- Random seed pinned in `config.yaml` for reproducibility.

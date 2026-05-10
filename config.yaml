@@ -1,0 +1,22 @@
+# Run name — used as checkpoint filename prefix
+run_name: unet_small
+seed: 42
+
+# Data
+train_root: datasets/train_data
+test_root: datasets/test_data
+val_fraction: 0.15
+
+# Model — change these to compare configurations
+model_name: unet           # "unet" or "resunet"
+base_channels: 32          # 32 = small, 64 = large
+depth: 4
+
+# Training
+epochs: 60
+batch_size: 8
+lr: 1.0e-3
+weight_decay: 1.0e-4
+num_workers: 4
+bce_weight: 0.5
+dice_weight: 0.5
