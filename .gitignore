@@ -1,0 +1,49 @@
+# Data — too large for git, downloaded from Kaggle
+datasets/train_data/rgb/*
+datasets/train_data/masks/*
+datasets/test_data/rgb/*
+!datasets/**/.gitkeep
+
+# Model checkpoints
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.ckpt
+!checkpoints/.gitkeep
+
+# Predictions / submissions
+predictions/*.csv
+predictions/*.png
+!predictions/.gitkeep
+
+# Logs
+runs/
+logs/
+wandb/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Jupyter
+notebooks/.ipynb_checkpoints/
+*.ipynb_checkpoints
