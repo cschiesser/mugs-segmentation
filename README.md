@@ -6,10 +6,6 @@ BCE + Dice loss and compared across two model sizes.
 
 **Best validation mean IoU: 0.9465** 
 
-## Task
-Given an RGB image (252 × 378 × 3), predict a binary mask of the same size where
-mug pixels are 1 and everything else 0.
-
 ## Approach
 - **Baseline:** classical U-Net with configurable depth and base channel count.
 - **Improved:** U-Net with residual blocks in encoder and decoder (`model_name: resunet`)
