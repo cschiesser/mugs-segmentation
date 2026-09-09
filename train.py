@@ -1,4 +1,4 @@
-"""ETH Mug segmentation — training and prediction in one script.
+"""Mug segmentation — training and prediction in one script.
 
     python train.py                                         # train with config.yaml
     python train.py --config config.yaml                    # same
@@ -26,7 +26,7 @@ import yaml
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from eth_mugs_dataset import ETHMugsDataset, make_train_val_split
+from mugs_dataset import MugsDataset, make_train_val_split
 
 
 # ---------------------------------------------------------------------------
@@ -368,7 +368,7 @@ def validate(model, loader, criterion, device):
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Train or predict ETH mug segmentation.")
+    p = argparse.ArgumentParser(description="Train or predict Mug segmentation.")
     p.add_argument("--config", default="config.yaml", help="Path to YAML config (default: config.yaml)")
     p.add_argument("--resume", default=None, help="Checkpoint path to resume training from")
     p.add_argument("--no-amp", action="store_true", help="Disable mixed-precision")
@@ -500,7 +500,7 @@ def main_predict(args: argparse.Namespace) -> None:
     device = get_device()
     print(f"[predict] device: {device}")
 
-    test_ds = ETHMugsDataset(cfg["test_root"], mode="test")
+    test_ds = MugsDataset(cfg["test_root"], mode="test")
     test_loader = DataLoader(
         test_ds,
         batch_size=cfg.get("batch_size", 8),

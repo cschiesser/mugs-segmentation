@@ -1,4 +1,4 @@
-"""Dataset class for the ETH Mug segmentation task.
+"""Dataset class for the Mug segmentation task.
 
 Loads paired (RGB image, binary mask) samples and applies augmentations
 where geometric transforms are synchronised between image and mask, while
@@ -25,7 +25,7 @@ IMG_HEIGHT = 252
 IMG_WIDTH = 378
 
 
-class ETHMugsDataset(Dataset):
+class MugsDataset(Dataset):
     """Loads RGB images and (optionally) binary segmentation masks.
 
     Folder layout expected (matches the project specification):
@@ -203,14 +203,14 @@ def make_train_val_split(
     val_fraction: float = 0.15,
     seed: int = 42,
     img_size: tuple[int, int] | None = None,
-) -> tuple[ETHMugsDataset, ETHMugsDataset]:
+) -> tuple[MugsDataset, MugsDataset]:
     """Deterministically split ``root`` into train + val datasets.
 
     The split is done by ID, so an image in val never leaks into train.
-    Returns two ETHMugsDataset instances that share the same underlying files
+    Returns two MugsDataset instances that share the same underlying files
     but use different image_id lists and different (train vs eval) transforms.
     """
-    base = ETHMugsDataset(root, mode="train", img_size=img_size)
+    base = MugsDataset(root, mode="train", img_size=img_size)
     ids = list(base.image_ids)
 
     rng = np.random.default_rng(seed)
@@ -219,10 +219,10 @@ def make_train_val_split(
     val_ids = sorted(ids[:n_val])
     train_ids = sorted(ids[n_val:])
 
-    train_ds = ETHMugsDataset(root, mode="train", img_size=img_size)
+    train_ds = MugsDataset(root, mode="train", img_size=img_size)
     train_ds.image_ids = train_ids
 
-    val_ds = ETHMugsDataset(root, mode="val", img_size=img_size)
+    val_ds = MugsDataset(root, mode="val", img_size=img_size)
     val_ds.image_ids = val_ids
 
     return train_ds, val_ds
