@@ -26,9 +26,9 @@ IMG_WIDTH = 378
 
 
 class MugsDataset(Dataset):
-    """Loads RGB images and (optionally) binary segmentation masks.
+    """Loads RGB images and binary segmentation masks.
 
-    Folder layout expected (matches the project specification):
+    Folder layout expected:
 
         root/
             rgb/   0001_rgb.jpg, 0002_rgb.jpg, ...

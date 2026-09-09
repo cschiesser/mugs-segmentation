@@ -1,4 +1,4 @@
-# Run name — used as checkpoint filename prefix
+# Run name used as checkpoint filename prefix
 run_name: unet_small
 seed: 42
 
@@ -7,7 +7,7 @@ train_root: datasets/train_data
 test_root: datasets/test_data
 val_fraction: 0.15
 
-# Model — change these to compare configurations
+# Model change these to compare configurations
 model_name: unet           # "unet" or "resunet"
 base_channels: 32          # 32 = small, 64 = large
 depth: 4
